@@ -1,0 +1,8 @@
+[configuration]
+
+entry_symbol = "library_init"
+
+[libraries]
+
+windows.debug.x86_64 = "native/bin/Windows/libworld.dll"
+windows.release.x86_64 = "native/bin/Windows/libworld.dll"

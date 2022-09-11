@@ -10,10 +10,17 @@ config_version=5
 
 [application]
 
-config/name="GDExtension Test Project"
 config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
+
+[display]
+
+window/stretch/mode="canvas_items"
 
 [native_extensions]
 
 paths=["res://example.gdextension"]
+
+[rendering]
+
+environment/defaults/default_environment="res://default_env.tres"

@@ -1,17 +1,4 @@
-MACRO(LIB_FINDER return_list)
-    FILE(GLOB_RECURSE new_list *.o *.obj *.a *.lib *.dll *.so)
-
-    message(${CMAKE_CURRENT_SOURCE_DIR})
-
-    SET(dir_list "")
-    FOREACH(file_path ${new_list})
-
-        SET(dir_list ${dir_list} ${file_path})
-
-    ENDFOREACH()
-    LIST(REMOVE_DUPLICATES dir_list)
-    SET(${return_list} ${dir_list})
-ENDMACRO()
+cmake_minimum_required(VERSION 3.0)
 
 MACRO(SUBDIRLIST result curdir)
     FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
@@ -24,29 +11,37 @@ MACRO(SUBDIRLIST result curdir)
     SET(${result} ${dirlist})
 ENDMACRO()
 
-LIB_FINDER(LIBS)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS})
-
 set(GODOT_CUSTOM_API_FILE "${CMAKE_CURRENT_SOURCE_DIR}/api/extension_api.json")
 
 SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
-FOREACH(subdir ${SUBDIRS})
-    if(EXISTS "${subdir}/CMakeLists.txt")
-        ADD_SUBDIRECTORY(${subdir})
-    else()
-        target_link_directories(${PROJECT_NAME} PRIVATE ${subdir})
-    endif()
-ENDFOREACH()
-
 include(ExternalProject)
 
-SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/third_party)
+SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/3rd_party)
 
-ExternalProject_Add(godot-cpp
+ExternalProject_Add(
+    godot-cpp
+
     GIT_REPOSITORY    https://github.com/godotengine/godot-cpp.git
-    GIT_TAG           master
+    #GIT_TAG           master
+    #GIT_SHALLOW       TRUE
+    GIT_TAG           8772a7faca8156a502b12dda36e46cdb6904814f
+
+    UPDATE_COMMAND ""
+    PATCH_COMMAND ""
     INSTALL_COMMAND ""
+
+    #SOURCE_DIR "${CMAKE_SOURCE_DIR}/,,/3rd_party/godot-cpp"
+    CMAKE_ARGS
+        #"-G@CMAKE_GENERATOR@"
+        -DBuildShared=ON
+        -DBuildExamples=OFF
+        -DCMAKE_INSTALL_PREFIX=${GLOBAL_OUTPUT_PATH}/godot-cpp
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+
+    TEST_COMMAND ""
+
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON
@@ -55,6 +50,15 @@ ExternalProject_Add(godot-cpp
 message(${CMAKE_CURRENT_BINARY_DIR})
 
 MACRO(ADDGODOT)
+
+    FOREACH(subdir ${SUBDIRS})
+        if(EXISTS "${subdir}/CMakeLists.txt")
+            ADD_SUBDIRECTORY(${subdir})
+        else()
+            target_link_directories(${PROJECT_NAME} PRIVATE ${subdir})
+        endif()
+    ENDFOREACH()
+
     ExternalProject_Get_Property(godot-cpp source_dir)
     message("source")
     message(${source_dir})
@@ -78,8 +82,13 @@ MACRO(ADDGODOT)
         ${binary_dir}/bin
     )
 
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${binary_dir}/bin/libgodot-cpp.${SYSTEM_NAME}.debug.64.a)
+    #string(TOLOWER ${CMAKE_HOST_SYSTEM_NAME} system)
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${binary_dir}/bin/libgodot-cpp.${CMAKE_SYSTEM_NAME}.${CMAKE_BUILD_TYPE}.64.a)
+
+    #target_link_libraries(${PROJECT_NAME} PRIVATE ${binary_dir}/bin)
 
     set_property(TARGET ${PROJECT_NAME} PROPERTY IMPORTED_LOCATION ${LIBRARY_PATH})
+
     add_dependencies(${PROJECT_NAME} godot-cpp)
 ENDMACRO()

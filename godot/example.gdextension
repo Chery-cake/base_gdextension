@@ -4,5 +4,8 @@ entry_symbol = "library_init"
 
 [libraries]
 
-windows.debug.x86_64 = "native/bin/Windows/libworld.dll"
-windows.release.x86_64 = "native/bin/Windows/libworld.dll"
+windows.debug.x86_64 = "res://bin/Windows/libWorld.dll"
+windows.release.x86_64 = "res://bin/Windows/libWorld.dll"
+
+linux.debug.x86_64 = "res://bin/Linux/libWorld.so"
+linux.release.x86_64 = "res://bin/Linux/libWorld.so"

@@ -25,7 +25,7 @@ ExternalProject_Add(
     GIT_REPOSITORY    https://github.com/godotengine/godot-cpp.git
     #GIT_TAG           master
     #GIT_SHALLOW       TRUE
-    GIT_TAG           f71c71164687ccb8049ce6d3506591c9c2b006dc
+    GIT_TAG           fa4d18f21cfae319b8f16a1604742cfec6022079
 
     UPDATE_COMMAND ""
     PATCH_COMMAND ""

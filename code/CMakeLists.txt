@@ -1,27 +1,13 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.30)
 
-MACRO(FILE_FINDER return_list)
-    FILE(GLOB_RECURSE new_list *.h *.hpp *.cpp *.c *.o *.obj *.d *.a *.lib)
-
-    set (EXCLUDE_DIR "/unused/")
-
-    SET(dir_list "")
-    FOREACH(file_path ${new_list})
-
-    	string (FIND ${file_path} ${EXCLUDE_DIR} EXCLUDE_DIR_FOUND)
-
-        if (${EXCLUDE_DIR_FOUND} EQUAL -1)
-            SET(dir_list ${dir_list} ${file_path})
-	    endif()
-
-    ENDFOREACH()
-    LIST(REMOVE_DUPLICATES dir_list)
-    SET(${return_list} ${dir_list})
-ENDMACRO()
-
-set(CMAKE_VERBOSE_MAKEFILE on)
-
-#set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/../cmake_toolchains/Windows.cmake)
+include(FetchContent)
+FetchContent_Declare(
+    godot-cpp
+    GIT_REPOSITORY  https://github.com/godotengine/godot-cpp.git
+    GIT_TAG         4.4
+    GIT_SHALLOW     TRUE
+)
+FetchContent_MakeAvailable(godot-cpp)
 
 set(PROJECT_NAME World)
 
@@ -29,50 +15,36 @@ project(${PROJECT_NAME} LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_CXX_STANDARD 23)
-
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+set(CMAKE_COLOR_DIAGNOSTICS ON)
+set(CMAKE_COLOR_MAKEFILE ON)
 
 set(BUILD_PATH ${CMAKE_SOURCE_DIR}/../godot/bin)
-
-string(TOLOWER "${CMAKE_SYSTEM_NAME}" SYSTEM_NAME)
-string(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
-set(MY_SYSTEM_OUTPUT_PATH ${CMAKE_SYSTEM_NAME})
-
-set(BUILD_PATH ${BUILD_PATH}/${MY_SYSTEM_OUTPUT_PATH})
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${BUILD_PATH}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${BUILD_PATH}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_PATH}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${BUILD_PATH}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${BUILD_PATH}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${BUILD_PATH}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${BUILD_PATH}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${BUILD_PATH}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${BUILD_PATH}")
 
-set(COMPILER_FLAGS "-fPIC -Wwrite-strings")
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-    set(LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
-endif()
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c*")
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h*")
 
-# that's just quick and dirty folder cleanup, actually CMake would detect what has changed
-file(REMOVE_RECURSE ${BUILD_PATH})
-file(MAKE_DIRECTORY  ${BUILD_PATH})
+add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lib build)
+#add_dependencies(${PROJECT_NAME} godot-cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp)
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+    
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 
-FILE_FINDER(FILES)
+    #PRIVATE
+    
+    #${SOURCE_DIR}/gdextension
+    #${SOURCE_DIR}/include
+    #${SOURCE_DIR}/src
 
-add_library(${PROJECT_NAME} SHARED ${FILES})
-
-ADD_DEFINITIONS(-DNDEBUG)
-ADD_DEFINITIONS(-fPIC)
-
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/gdextension)
-#target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-
-ADDGODOT()
-
-set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS ${COMPILER_FLAGS})
-set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS ${LINKER_FLAGS})
-set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
+    #${BINARY_DIR}/gen/include
+    #${BINARY_DIR}/gen/src
+)

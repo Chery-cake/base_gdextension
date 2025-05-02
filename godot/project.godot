@@ -10,12 +10,10 @@ config_version=5
 
 [application]
 
-config/features=PackedStringArray("4.0")
+config/name="GDExtension Test Project"
+run/main_scene="uid://dmx2xuigcpvt4"
+config/features=PackedStringArray("4.4")
 config/icon="res://icon.png"
-
-[display]
-
-window/stretch/mode="canvas_items"
 
 [native_extensions]
 
@@ -23,4 +21,5 @@ paths=["res://example.gdextension"]
 
 [rendering]
 
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_environment="res://default_env.tres"

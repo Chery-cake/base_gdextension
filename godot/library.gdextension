@@ -1,0 +1,12 @@
+[configuration]
+
+entry_symbol = "library_init"
+compatibility_minimum = "4.1"
+
+[libraries]
+
+windows.debug.x86_64 = "res://bin/libWorld.dll"
+windows.release.x86_64 = "res://bin/libWorld.dll"
+
+linux.debug.x86_64 = "res://bin/libWorld.so"
+linux.release.x86_64 = "res://bin/libWorld.so"

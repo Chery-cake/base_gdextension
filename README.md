@@ -1,6 +1,6 @@
 # base_gdextension
 
-To start the project go to the folder `code`, and execute ``` cmake -Bbuild ``` to start the project.
+To start the project go to the folder `code`, and execute `cmake -Bbuild` to start the project.
 
 Now you can build the project with the `make` comand on the `build` file.
 

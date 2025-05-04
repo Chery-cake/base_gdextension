@@ -32,19 +32,9 @@ file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 
-#add_dependencies(${PROJECT_NAME} godot-cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp)
 target_include_directories(${PROJECT_NAME}
     PUBLIC
     
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-
-    #PRIVATE
-    
-    #${SOURCE_DIR}/gdextension
-    #${SOURCE_DIR}/include
-    #${SOURCE_DIR}/src
-
-    #${BINARY_DIR}/gen/include
-    #${BINARY_DIR}/gen/src
 )

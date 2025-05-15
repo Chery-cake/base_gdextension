@@ -1,6 +1,6 @@
 # base_gdextension
 
-To start the project go to the folder `code`, and execute `cmake -Bbuild` to start the project.
+To start the project go to the folder `code`, and execute `cmake -Bbuild` to start the project. On windows you may need to specify the generator, for example, to use MinGW as your generator, `cmake -B build -G "MinGW Makefiles"`.
 
 Now you can build the project with the `make` comand on the `build` file.
 
